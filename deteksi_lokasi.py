@@ -1,53 +1,68 @@
 import requests
-from colorama import Fore, Style, init
+import time
+import os
 
-# Inisialisasi colorama untuk mendukung warna di Termux
-init(autoreset=True)
+def clear_screen():
+    os.system('clear')
 
-# API Key dari OpenCage
-API_KEY = "225796962c914083b79ebd419bb74681"
+def main_menu():
+    while True:
+        clear_screen()
+        print("=" * 35)
+        print("       🔍 LOKASI TRACKER MENU       ")
+        print("=" * 35)
+        print("[1] 🚀 Run Location Script")
+        print("[2] ❌ Exit")
+        print("[3] 👤 Credits")
+        print("[4] 🔄 Refresh Menu")
+        print("=" * 35)
 
-def deteksi_lokasi(lat, lon):
-    """Fungsi untuk mendeteksi lokasi berdasarkan latitude dan longitude."""
-    url = f"https://api.opencagedata.com/geocode/v1/json?q={lat}+{lon}&key={API_KEY}"
-    response = requests.get(url)
+        choice = input("Pilih opsi (1-4): ")
 
-    if response.status_code == 200:
-        data = response.json()
-        if data['results']:
-            lokasi = data['results'][0]['components']
-            print(f"\n{Fore.CYAN}Lokasi Terdeteksi:")
-            print(f"{Fore.GREEN}- Desa/Kelurahan: {lokasi.get('village', 'Tidak Diketahui')}")
-            print(f"{Fore.GREEN}- Kecamatan: {lokasi.get('suburb', 'Tidak Diketahui')}")
-            print(f"{Fore.GREEN}- Kabupaten/Kota: {lokasi.get('city', 'Tidak Diketahui')}")
-            print(f"{Fore.GREEN}- Provinsi: {lokasi.get('state', 'Tidak Diketahui')}")
-            print(f"{Fore.GREEN}- Negara: {lokasi.get('country', 'Tidak Diketahui')}")
+        if choice == "1":
+            run_script()
+        elif choice == "2":
+            print("Terima kasih telah menggunakan program ini!")
+            time.sleep(1)
+            break
+        elif choice == "3":
+            show_credits()
+        elif choice == "4":
+            print("Merefresh menu...")
+            time.sleep(1)
         else:
-            print(f"{Fore.RED}Lokasi tidak ditemukan.")
-    else:
-        print(f"{Fore.RED}Terjadi kesalahan: {response.status_code}")
+            print("Pilihan tidak valid. Coba lagi.")
+            time.sleep(1)
 
-def menu():
-    """Fungsi untuk menampilkan menu utama."""
-    print(f"{Fore.YELLOW}===== MENU UTAMA =====")
-    print(f"{Fore.MAGENTA}[1] Lanjut Cek Lokasi")
-    print(f"{Fore.MAGENTA}[2] Batalkan")
-    print(f"{Fore.MAGENTA}[3] Credit Pembuat")
+def run_script():
+    clear_screen()
+    print("Menjalankan script lokasi...")
+    try:
+        # Mengambil data lokasi dari API ipinfo.io
+        response = requests.get("https://ipinfo.io")
+        data = response.json()
 
-    pilihan = input(f"\n{Fore.CYAN}Masukkan pilihan Anda: ")
+        # Menampilkan hasil lokasi
+        print("=== 📍 Lokasi Terdeteksi ===")
+        print(f"Kota: {data.get('city', 'Tidak Diketahui')}")
+        print(f"Wilayah: {data.get('region', 'Tidak Diketahui')}")
+        print(f"Negara: {data.get('country', 'Tidak Diketahui')}")
+        print(f"Lokasi (Latitude, Longitude): {data.get('loc', 'Tidak Diketahui')}")
+        print(f"ISP: {data.get('org', 'Tidak Diketahui')}")
+        print("============================")
+    except Exception as e:
+        print("Gagal mendeteksi lokasi. Periksa koneksi internet.")
+        print("Error:", e)
+    input("\nTekan Enter untuk kembali ke menu...")
 
-    if pilihan == "1":
-        latitude = input(f"{Fore.CYAN}Masukkan Latitude: ")
-        longitude = input(f"{Fore.CYAN}Masukkan Longitude: ")
-        deteksi_lokasi(latitude, longitude)
-    elif pilihan == "2":
-        print(f"{Fore.RED}Program dibatalkan.")
-    elif pilihan == "3":
-        print(f"\n{Fore.GREEN}Program ini dibuat oleh: Nama Anda")
-    else:
-        print(f"{Fore.RED}Pilihan tidak valid. Silakan coba lagi.")
-        menu()
+def show_credits():
+    clear_screen()
+    print("=== 👤 Credits ===")
+    print("Script dibuat oleh Muhammad David Aryanto (davidcuy@contact.me")
+    print("Versi: 1.0")
+    print("Terima kasih telah menggunakan script ini!")
+    print("==================")
+    input("\nTekan Enter untuk kembali ke menu...")
 
-# Menjalankan menu
-if __name__ == "__main__":
-    menu()
+# Menjalankan menu utama
+main_menu()
